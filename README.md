@@ -17,12 +17,13 @@
 
 ```json
 {
-    "username": "130********",
-    "password": "******",
-    "dutyDate": "2017-10-18",
-    "hospitalId": "142",
-    "departmentId": "200039602",
-    "dutyCode": "1",
+    "username": "132888888888",
+    "password": "bugaosuni",
+    "dutyDate": "2019-07-15",
+    "patientId": "241788888",
+    "hospitalId": "113",
+    "departmentId": "200000759",
+    "dutyCode": "2",
     "medicareCardId": "",
     "autoChoose": true
 }
@@ -35,6 +36,7 @@
 | username       |    是    | 登录手机号       |                                   |
 | password       |    是    | 密码             |                                   |
 | dutyDate       |          | 挂号日期         | 为空时，自动挂最新一天            |
+| patientId      |    是    | 诊号             |  自己去查吧                     |
 | hospitalId     |    是    | 医院ID           | 如142-北医三院                    |
 | departmentId   |    是    | 科室ID           | 如200039602-运动医学科            |
 | dutyCode       |    是    | 上午/下午        | 1-上午，2-下午                    |
