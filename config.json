@@ -1,10 +1,11 @@
 {
-    "username": "130********",
-    "password": "******",
-    "dutyDate": "2017-10-18",
-    "hospitalId": "142",
-    "departmentId": "200039602",
-    "dutyCode": "1",
+    "username": "132888888888",
+    "password": "bugaosuni",
+    "dutyDate": "2019-07-15",
+    "patientId": "241788888",
+    "hospitalId": "113",
+    "departmentId": "200000759",
+    "dutyCode": "2",
     "medicareCardId": "",
     "autoChoose": true
 }

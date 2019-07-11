@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import base64
 import json
 import logging
@@ -37,15 +39,17 @@ class Registration:
         self.duty_code = ''  # 1:上午 2:下午
         self.medicare_card_id = ''  # 社保卡号
         self.auto_choose = True  # 是否服从系统分配
+        self.patient_id = ''  # 就诊人ID
 
         self.doctor = {}  # 选定的医生
-        self.patient_id = ''  # 就诊人ID
         self.start_time = 0  # 抢号开始时间戳
 
         # URL
-        self.domain = 'http://www.bjguahao.gov.cn'
+        #self.domain = 'http://www.bjguahao.gov.cn'
+        self.domain = 'http://www.114yygh.com'
         self.login_url = self.domain + '/quicklogin.htm'  # 登录
         self.part_duty_url = self.domain + '/dpt/partduty.htm'  # 获取号源信息
+        #self.send_order_url = self.domain + '/v/sendSmsCode.htm'  # 登陆
         self.send_order_url = self.domain + '/v/sendorder.htm'  # 发送短信验证码
         self.confirm_url = self.domain + '/order/confirmV1.htm'  # 挂号
         self.appoint_url = self.domain + '/dpt/appoint/{0}-{1}.htm'  # 预约信息页
@@ -94,10 +98,11 @@ class Registration:
             self.duty_code = data.get('dutyCode')
             self.medicare_card_id = data.get('medicareCardId', '').upper()
             self.auto_choose = data.get('autoChoose', True)
+            self.patient_id = data.get('patientId')
 
             logging.info('配置加载完成')
             logging.debug('config: ' + str(data))
-        if not all([self.mobile_no, self.password, self.hospital_id, self.department_id, self.duty_code]):
+        if not all([self.mobile_no, self.password, self.hospital_id, self.department_id, self.duty_code, self.patient_id]):
             logging.error('必选配置项有误，请重新修改')
             sys.exit()
         return
@@ -142,7 +147,7 @@ class Registration:
                     yzm='',
                     isAjax=True)
         res = self.request('post', self.login_url, data=args)
-        logging.debug('response: ' + res.text)
+        print('response: ' + res.text)
         try:
             data = res.json()
             if data.get('code') == 200:
@@ -206,32 +211,13 @@ class Registration:
             logging.error('选择失败', e)
             return False
 
-    def get_patient_id(self):
-        """
-        获取就诊人ID
-        :return: string or None
-        """
-        url = self.patient_form_url.format(self.hospital_id, self.department_id,
-                                           self.doctor.get('doctorId'), self.doctor.get('dutySourceId'))
-        res = self.request('get', url)
-        data = res.text
-        m = re.search(r'<input type="radio" name="hzr" value="(?P<patientId>\d+)"[^|]*\|\s' + self.medicare_card_id,
-                      data)
-        if m is None:
-            logging.error('获取就诊人ID失败')
-            return None
-        else:
-            self.patient_id = m.group('patientId')
-            logging.info('就诊人ID: ' + self.patient_id)
-            return self.patient_id
-
     def get_sms_verify_code(self):
         """
         获取短信验证码
         :return: bool
         """
         res = self.request('post', self.send_order_url, data='')
-        logging.debug('response: ' + res.text)
+        print('fuck response: ' + res.text)
         try:
             data = res.json()
             if data.get('code') == 200:
@@ -291,12 +277,11 @@ class Registration:
         if self.auth_login():
             while True:
                 if self.choose_doctor():
-                    if self.get_patient_id():
-                        if self.get_sms_verify_code():
-                            sms_code = input('请输入短信验证码: ')
-                            res = self.get_register(sms_code)
-                            if res:
-                                break
+                    if self.get_sms_verify_code():
+                        sms_code = input('请输入短信验证码: ')
+                        res = self.get_register(sms_code)
+                        if res:
+                            break
                     time.sleep(1)
                 else:
                     if self.doctor == {}:
